@@ -1,31 +1,28 @@
-#!/bin/bash
-############################
-# .make.sh
-# This script creates symlinks from the home directory to any desired dotfiles in $HOME/dotfiles
-############################
+#!/usr/bin/env bash
 
-########## Variables
+# Variables
+DOTFILES_REMOTE=git@github.com:pulinau/dotfiles.git
+DOTFILES_DIR=$HOME/.dotfiles
+BACKUP_DIR=$HOME/.dotfiles_old
 
-dir=$HOME/.dotfiles                         # dotfiles directory
-olddir=$HOME/.dotfiles_old                  # old dotfiles backup directory
-files="bashrc vimrc vim zshrc oh-my-zsh"    # list of files/folders to symlink in homedir
+git clone --bare $DOTFILES_REMOTE $DOTFILES_DIR
 
-##########
+# define config alias locally since the dotfiles
+# aren't installed on the system yet
+function config {
+   git --git-dir=$DOTFILES_DIR --work-tree=$HOME $@
+}
 
-# create dotfiles_old in homedir
-echo "Creating $olddir for backup of any existing dotfiles in $HOME"
-mkdir -p $olddir
-echo "...done"
+# create a directory to backup existing dotfiles to
+mkdir -p $BACKUP_DIR
+config checkout
+if [ $? = 0 ]; then
+  echo "Checked out dotfiles from $DOTFILES_REMOTE";
+  else
+    echo "Moving existing dotfiles to $BACKUP_DIR";
+    config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} $BACKUP_DIR{}
+fi
 
-# change to the dotfiles directory
-echo "Changing to the $dir directory"
-cd $dir
-echo "...done"
-
-# move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks 
-for file in $files; do
-    echo "Moving any existing dotfiles from $HOME to $olddir"
-    mv $HOME/.$file $HOME/dotfiles_old/
-    echo "Creating symlink to $file in home directory."
-    ln -s $dir/$file $HOME/.$file
-done
+# checkout dotfiles from repo
+config checkout
+config config status.showUntrackedFiles no
