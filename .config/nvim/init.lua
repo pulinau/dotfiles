@@ -89,7 +89,6 @@ vim.opt.splitright = true -- Vertical splits go right
 vim.pack.add({
   { src = "https://github.com/catppuccin/nvim",                name = "catppuccin" },
   { src = "https://github.com/nvim-mini/mini.nvim" },
-  { src = "https://github.com/folke/which-key.nvim" },
   { src = "https://github.com/stevearc/oil.nvim" },
   { src = "https://github.com/mason-org/mason.nvim" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
@@ -104,18 +103,79 @@ require "lualine".setup({
 })
 require "mason".setup()
 require "mini.completion".setup()
+require "mini.icons".setup()
 require "mini.pick".setup()
 require "mini.snippets".setup()
-require "mini.snippets".setup()
+require "mini.surround".setup()
 require "nvim-treesitter.config".setup({
   install_dir = vim.fn.stdpath('data') .. '/site',
   ensure_installed = { "lua", "go" },
   highlight = { enable = true },
+  additional_vim_regex_highlighting = { "go" },
 })
 require "oil".setup()
 
--- Theming
+local miniclue = require('mini.clue')
+miniclue.setup({ -- cute prompts about bindings
+  triggers = {
+    -- Leader key
+    { mode = { 'n', 'x' }, keys = '<Leader>' },
+
+    -- Built-in completion
+    { mode = 'i',          keys = '<C-x>' },
+
+    -- `g` key
+    { mode = { 'n', 'x' }, keys = 'g' },
+
+    -- Marks
+    { mode = { 'n', 'x' }, keys = "'" },
+    { mode = { 'n', 'x' }, keys = '`' },
+
+    -- Registers
+    { mode = { 'n', 'x' }, keys = '"' },
+    { mode = { 'i', 'c' }, keys = '<C-r>' },
+
+    -- Window commands
+    { mode = 'n',          keys = '<C-w>' },
+
+    -- `z` key
+    { mode = { 'n', 'x' }, keys = 'z' },
+
+    -- Bracketed
+    { mode = 'n',          keys = '[' },
+    { mode = 'n',          keys = ']' },
+  },
+  clues = {
+    miniclue.gen_clues.builtin_completion(),
+    miniclue.gen_clues.g(),
+    miniclue.gen_clues.marks(),
+    miniclue.gen_clues.registers(),
+    miniclue.gen_clues.windows(),
+    miniclue.gen_clues.z(),
+  },
+  window = {
+    delay = 500,
+    config = {
+      anchor = 'SW',
+      width = 'auto',       -- automatically adjust preview window based on content width
+    },
+  },
+})
+
+-- Theme & transparency
 vim.cmd.colorscheme("catppuccin-macchiato")
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
+vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "none" })
+vim.api.nvim_set_hl(0, "TabLine", { bg = "none" })
+vim.api.nvim_set_hl(0, "TabLineFill", { bg = "none", fg = "#767676" })
+vim.api.nvim_set_hl(0, "TabLineSel", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "ColorColumn", { bg = "none" })
 
 -- ============================================================================
 -- LSP CONFIG
@@ -124,14 +184,27 @@ vim.cmd.colorscheme("catppuccin-macchiato")
 -- Better autocomplete
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(event)
-    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client:supports_method('textDocument/completion') then
+    local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
+    if client:supports_method('textDocument/completion') then
       vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
     end
 
     -- LSP keymaps
     local bufmap = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = event.buf, desc = 'LSP: ' .. desc })
+    end
+
+    -- Auto-format ("lint") on save.
+    -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
+    if not client:supports_method('textDocument/willSaveWaitUntil')
+        and client:supports_method('textDocument/formatting') then
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = vim.api.nvim_create_augroup('my.lsp', { clear = false }),
+        buffer = event.buf,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 1000 })
+        end,
+      })
     end
 
     -- Default Neovim v0.11 Style Mappings
@@ -151,7 +224,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 vim.cmd("set completeopt+=noselect")
 
-vim.lsp.enable({ "lua_ls", "gopls", "ts_ls" })
+vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "jdtls", "fish_lsp", "bashls" })
 
 vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format current buffer" })
 
@@ -233,7 +306,7 @@ vim.keymap.set("n", "<leader>pa", function()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)
   print("file:", path)
-end)
+end, { desc = "Copy full filepath to clipboard" })
 
 -- Basic autocommands
 local augroup = vim.api.nvim_create_augroup("UserConfig", {})

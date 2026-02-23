@@ -91,7 +91,7 @@ return {
             hint = { enable = true, semicolon = 'Disable' },
             diagnostics = {
                 -- Get the language server to recognize the `vim` global
-                globals = { 'vim' },
+                globals = { 'vim', 'wezterm' },
             },
             workspace = {
                 -- Make the server aware of Neovim runtime files
