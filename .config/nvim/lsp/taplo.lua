@@ -11,7 +11,17 @@
 
 ---@type vim.lsp.Config
 return {
-  cmd = { 'taplo', 'lsp', 'stdio' },
-  filetypes = { 'toml' },
-  root_markers = { '.taplo.toml', 'taplo.toml', '.git' },
+    cmd = { 'taplo', 'lsp', 'stdio' },
+    filetypes = { 'toml' },
+    -- root_markers is used by vim.lsp.enable to find the project root automatically
+    root_markers = { '.taplo.toml', 'taplo.toml', '.git', 'Cargo.toml', 'starship.toml' },
+
+    -- Settings to ensure schemas are processed
+    settings = {
+        evenBetterToml = {
+            schema = {
+                enabled = true,
+            },
+        },
+    },
 }
