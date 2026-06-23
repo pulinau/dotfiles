@@ -7,13 +7,21 @@
 
 # Whitelist configs
 !.config/
+
 !.config/fish
-!.config/fish/**
+!.config/fish/***
 .config/fish/fish_variables
+
 !.config/nvim/
-!.config/nvim/**
+!.config/nvim/***
+
 !.config/hypr/
-!.config/hypr/**
+!.config/hypr/***
+
 !.config/kitty/
+
 !.config/wezterm/
+
+!.config/quickshell/
+!.config/quickshell/***
 

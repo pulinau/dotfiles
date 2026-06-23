@@ -1,0 +1,11 @@
+PROGRAMS = require('modules.programs')
+
+require("modules.monitors")
+require("modules.keybinds")
+require("modules.autostart")
+require("modules.env")
+require("modules.decorations")
+require("modules.windowrules")
+require("modules.layout")
+require("modules.input")
+require("modules.misc")
