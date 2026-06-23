@@ -1,4 +1,5 @@
-if status is-interactive
+if type -q mise 
+  and status is-interactive
     # Commands to run in interactive sessions can go here
     mise activate fish | source
 end
@@ -43,3 +44,7 @@ abbr -a -- gst 'git stash'
 abbr -a -- gstl 'git stash list'
 abbr -a --set-cursor='%' -- gstp 'git stash push -m "%"'
 abbr -a -- gstpop 'git stash pop'
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/home/pulinau/.local/bin" $PATH
