@@ -9,7 +9,13 @@
 
 ---@type vim.lsp.Config
 return {
-  cmd = { 'hyprls', '--stdio' },
-  filetypes = { 'hyprlang' },
-  root_markers = { '.git' },
+  cmd = { "hyprls" },
+  filetypes = { "hyprland" },
+  root_dir = vim.fn.getcwd(),
+  settings = {
+    hyprls = {
+      preferIgnoreFile = false,
+      ignore = { "hyprlock.conf", "hypridle.conf" }
+    }
+  }
 }

@@ -1,22 +1,28 @@
 -- ============================================================================
+-- LEADER KEY CONFIGURATION
+-- ============================================================================
+vim.g.mapleader = " "      -- Set leader key to space
+vim.g.maplocalleader = " " -- Set local leader key (NEW)
+
+-- ============================================================================
 -- PLUGIN CONFIGURATIONS
 -- ============================================================================
 vim.pack.add({
-    { src = "https://github.com/catppuccin/nvim",                          name = "catppuccin" },
-    { src = "https://github.com/nvim-mini/mini.nvim" },
-    { src = "https://github.com/stevearc/oil.nvim" },
-    { src = "https://github.com/mason-org/mason.nvim" },
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-    { src = "https://github.com/nvim-lualine/lualine.nvim" },
-    { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
-    { src = "https://github.com/iamcco/markdown-preview.nvim",             ft = { "markdown" }, },
+  { src = "https://github.com/catppuccin/nvim",                          name = "catppuccin" },
+  { src = "https://github.com/nvim-mini/mini.nvim" },
+  { src = "https://github.com/stevearc/oil.nvim" },
+  { src = "https://github.com/mason-org/mason.nvim" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+  { src = "https://github.com/nvim-lualine/lualine.nvim" },
+  { src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" },
+  { src = "https://github.com/iamcco/markdown-preview.nvim",             ft = { "markdown" }, },
 })
 
 require("lualine").setup({
-    options = {
-        theme = "catppuccin",
-        icons_enabled = true,
-    }
+  options = {
+    theme = "catppuccin",
+    icons_enabled = true,
+  }
 })
 require("mason").setup()
 
@@ -25,126 +31,139 @@ require("mason").setup()
 require("mini.completion").setup()
 local miniclue = require("mini.clue")
 miniclue.setup({ -- cute prompts about bindings
-    triggers = {
-        -- Leader key
-        { mode = { "n", "x" }, keys = "<Leader>" },
+  triggers = {
+    -- Leader key
+    { mode = { "n", "x" }, keys = "<Leader>" },
 
-        -- Built-in completion
-        { mode = "i",          keys = "<C-x>" },
+    -- Built-in completion
+    { mode = "i",          keys = "<C-x>" },
 
-        -- `g` key
-        { mode = { "n", "x" }, keys = "g" },
+    -- `g` key
+    { mode = { "n", "x" }, keys = "g" },
 
-        -- Marks
-        { mode = { "n", "x" }, keys = "'" },
-        { mode = { "n", "x" }, keys = "`" },
+    -- Marks
+    { mode = { "n", "x" }, keys = "'" },
+    { mode = { "n", "x" }, keys = "`" },
 
-        -- Registers
-        { mode = { "n", "x" }, keys = '"' },
-        { mode = { "i", "c" }, keys = "<C-r>" },
+    -- Registers
+    { mode = { "n", "x" }, keys = '"' },
+    { mode = { "i", "c" }, keys = "<C-r>" },
 
-        -- Window commands
-        { mode = "n",          keys = "<C-w>" },
+    -- Window commands
+    { mode = "n",          keys = "<C-w>" },
 
-        -- `z` key
-        { mode = { "n", "x" }, keys = "z" },
+    -- `z` key
+    { mode = { "n", "x" }, keys = "z" },
 
-        -- Bracketed
-        { mode = "n",          keys = "[" },
-        { mode = "n",          keys = "]" },
+    -- Bracketed
+    { mode = "n",          keys = "[" },
+    { mode = "n",          keys = "]" },
 
-        -- mini.clue
-        { mode = { "n", "x" }, keys = "s" }
+    -- mini.clue
+    { mode = { "n", "x" }, keys = "s" }
+  },
+  clues = {
+    miniclue.gen_clues.builtin_completion(),
+    miniclue.gen_clues.g(),
+    miniclue.gen_clues.marks(),
+    miniclue.gen_clues.registers(),
+    miniclue.gen_clues.windows(),
+    miniclue.gen_clues.z(),
+  },
+  window = {
+    delay = 500,
+    config = {
+      anchor = "SW",
+      width = "auto", -- automatically adjust preview window based on content width
     },
-    clues = {
-        miniclue.gen_clues.builtin_completion(),
-        miniclue.gen_clues.g(),
-        miniclue.gen_clues.marks(),
-        miniclue.gen_clues.registers(),
-        miniclue.gen_clues.windows(),
-        miniclue.gen_clues.z(),
-    },
-    window = {
-        delay = 500,
-        config = {
-            anchor = "SW",
-            width = "auto", -- automatically adjust preview window based on content width
-        },
-        sorting = "alphanum",
-    },
+    sorting = "alphanum",
+  },
+})
+local hipatterns = require("mini.hipatterns")
+hipatterns.setup({
+  highlighters = {
+    -- Highlight hex color strings (`#rrggbb`) using that color
+    hex_color = hipatterns.gen_highlighter.hex_color(),
+  }
 })
 require("mini.icons").setup()
 require("mini.pick").setup()
 local gen_loader = require("mini.snippets").gen_loader
 require("mini.snippets").setup({
-    -- Load custom file with global snippets first.
-    gen_loader.from_file("~/.config/nvim/snippets/global.json"),
+  -- Load custom file with global snippets first.
+  gen_loader.from_file("~/.config/nvim/snippets/global.json"),
 
-    -- Load snippets based on current language by reading files from
-    -- "snippets/" subdirectories from 'runtimepath' directories.
-    gen_loader.from_lang(),
+  -- Load snippets based on current language by reading files from
+  -- "snippets/" subdirectories from 'runtimepath' directories.
+  gen_loader.from_lang(),
 })
 require("mini.surround").setup()
 
+-- nvim.treesitter setup
+
 require("nvim-treesitter").setup({
-    install_dir = vim.fn.stdpath("data") .. "/site",
-    ensure_installed = { "lua", "go" },
-    highlight = { enable = true },
-    additional_vim_regex_highlighting = { "go" },
+  install_dir = vim.fn.stdpath("data") .. "/site",
+  ensure_installed = { "lua", "go" },
+  highlight = { enable = true },
+  additional_vim_regex_highlighting = { "go" },
 })
 
 -- "oil.nvim" setup.
 
 -- Declare a global function to retrieve the current directory.
 function _G.get_oil_winbar()
-    local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
-    local dir = require("oil").get_current_dir(bufnr)
-    if dir then
-        return vim.fn.fnamemodify(dir, ":~")
-    else
-        -- If there is no current directory (e.g. over ssh), just show the buffer name.
-        return vim.api.nvim_buf_get_name(0)
-    end
-end
-
--- Helper function to parse git output.
-local function parse_git_output(proc)
-    local result = proc:wait()
-    local ret = {}
-    if result.code == 0 then
-        for line in vim.gsplit(result.stdout, "\n", { plain = true, trimempty = true }) do
-            -- Remove trailing slash
-            line = line:gsub("/$", "")
-            ret[line] = true
-        end
-    end
-    return ret
+  local bufnr = vim.api.nvim_win_get_buf(vim.g.statusline_winid)
+  local dir = require("oil").get_current_dir(bufnr)
+  if dir then
+    return vim.fn.fnamemodify(dir, ":~")
+  else
+    -- If there is no current directory (e.g. over ssh), just show the buffer name.
+    return vim.api.nvim_buf_get_name(0)
+  end
 end
 
 -- Build git status cache.
 local function new_git_status()
-    return setmetatable({}, {
-        __index = function(self, key)
-            local ignore_proc = vim.system(
-                { "git", "ls-files", "--ignored", "--exclude-standard", "--others", "--directory" },
-                {
-                    cwd = key,
-                    text = true,
-                }
-            )
-            local tracked_proc = vim.system({ "git", "ls-tree", "HEAD", "--name-only" }, {
-                cwd = key,
-                text = true,
-            })
-            local ret = {
-                ignored = parse_git_output(ignore_proc),
-                tracked = parse_git_output(tracked_proc),
-            }
+  return setmetatable({}, {
+    __index = function(self, key)
+      -- 1. Immediately return an empty state so Neovim doesn't freeze
+      local ret = { ignored = {}, tracked = {} }
+      rawset(self, key, ret)
 
-            rawset(self, key, ret)
-            return ret
-        end,
-    })
+      -- 2. Fetch ignored files asynchronously
+      vim.system(
+        { "git", "ls-files", "--ignored", "--exclude-standard", "--others", "--directory" },
+        { cwd = key, text = true },
+        function(result)
+          if result.code == 0 then
+            for line in vim.gsplit(result.stdout, "\n", { plain = true, trimempty = true }) do
+              -- Remove trailing slash
+              line = line:gsub("/$", "")
+              ret.ignored[line] = true
+            end
+            -- Tell Neovim to refresh the buffer once the data arrives
+            vim.schedule(function() vim.cmd("checktime") end)
+          end
+        end
+      )
+
+      -- 3. Fetch tracked files asynchronously
+      vim.system(
+        { "git", "ls-tree", "HEAD", "--name-only" },
+        { cwd = key, text = true },
+        function(result)
+          if result.code == 0 then
+            for line in vim.gsplit(result.stdout, "\n", { plain = true, trimempty = true }) do
+              ret.tracked[line] = true
+            end
+            vim.schedule(function() vim.cmd("checktime") end)
+          end
+        end
+      )
+
+      return ret
+    end,
+  })
 end
 local git_status = new_git_status()
 
@@ -152,52 +171,52 @@ local git_status = new_git_status()
 local refresh = require("oil.actions").refresh
 local orig_refresh = refresh.callback
 refresh.callback = function(...)
-    git_status = new_git_status()
-    orig_refresh(...)
+  git_status = new_git_status()
+  orig_refresh(...)
 end
 
 -- File detail view will initially be off.
 local detail = false
 
 require("oil").setup({
-    keymaps = {
-        ["gd"] = {
-            desc = "Toggle file detail view",
-            callback = function()
-                detail = not detail
-                if detail then
-                    require("oil").set_columns({ "icon", "permissions", "size", "mtime" })
-                else
-                    require("oil").set_columns({ "icon" })
-                end
-            end
-        },
+  keymaps = {
+    ["gd"] = {
+      desc = "Toggle file detail view",
+      callback = function()
+        detail = not detail
+        if detail then
+          require("oil").set_columns({ "icon", "permissions", "size", "mtime" })
+        else
+          require("oil").set_columns({ "icon" })
+        end
+      end
     },
-    win_options = {
-        winbar = "%!v:lua.get_oil_winbar()",
-    },
-    view_options = {
-        is_hidden_file = function(name, bufnr)
-            local dir = require("oil").get_current_dir(bufnr)
-            local is_dotfile = vim.startswith(name, ".") and name ~= ".."
-            -- if no local directory (e.g., for ssh connections), just hide dotfiles.
-            if not dir then
-                return is_dotfile
-            end
-            -- dotfiles are considered hidden unless tracked.
-            if is_dotfile then
-                return not git_status[dir].tracked[name]
-            else
-                -- Check if file is gitignored.
-                return git_status[dir].ignored[name]
-            end
-        end,
-    },
+  },
+  win_options = {
+    winbar = "%!v:lua.get_oil_winbar()",
+  },
+  view_options = {
+    is_hidden_file = function(name, bufnr)
+      local dir = require("oil").get_current_dir(bufnr)
+      local is_dotfile = vim.startswith(name, ".") and name ~= ".."
+      -- if no local directory (e.g., for ssh connections), just hide dotfiles.
+      if not dir then
+        return is_dotfile
+      end
+      -- dotfiles are considered hidden unless tracked.
+      if is_dotfile then
+        return not git_status[dir].tracked[name]
+      else
+        -- Check if file is gitignored.
+        return git_status[dir].ignored[name]
+      end
+    end,
+  },
 })
 
 -- Set up in-editor markdown rendering with LSP support.
 require("render-markdown").setup({
-    completions = { lsp = { enabled = true } },
+  completions = { lsp = { enabled = true } },
 })
 
 -- ============================================================================
@@ -206,21 +225,21 @@ require("render-markdown").setup({
 
 -- Check global theme settings and apply theme.
 local function apply_shared_theme()
-    local xdg_config = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
-    local file = io.open(xdg_config .. "/theme_profile", "r")
-    if not file then return end
+  local xdg_config = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
+  local file = io.open(xdg_config .. "/theme_profile", "r")
+  if not file then return end
 
-    local contents = file:read("*a")
-    file:close()
-    local name = contents:match('THEME_NAME="([^"]+)"')
-    local variant = contents:match('THEME_VARIANT="([^"]+)"')
+  local contents = file:read("*a")
+  file:close()
+  local name = contents:match('THEME_NAME="([^"]+)"')
+  local variant = contents:match('THEME_VARIANT="([^"]+)"')
 
-    if name == "tokyonight" then
-        require("tokyonight").setup({ style = variant, transparent = true })
-        vim.cmd.colorscheme("tokyonight")
-    elseif name == "catppuccin" then
-        vim.cmd.colorscheme("catppuccin-" .. variant)
-    end
+  if name == "tokyonight" then
+    require("tokyonight").setup({ style = variant, transparent = true })
+    vim.cmd.colorscheme("tokyonight")
+  elseif name == "catppuccin" then
+    vim.cmd.colorscheme("catppuccin-" .. variant)
+  end
 end
 apply_shared_theme()
 
@@ -256,7 +275,7 @@ vim.opt.autoindent = true  -- Copy indent from current line
 -- Search settings
 vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true  -- Case sensitive if uppercase in search
-vim.opt.hlsearch = false  -- Don't highlight search results
+vim.opt.hlsearch = true   -- Highlight search results
 vim.opt.incsearch = true  -- Show matches as you type
 
 -- Visual settings
@@ -281,7 +300,7 @@ vim.opt.winborder = "rounded"                     -- Rounded borders on windows
 -- Create undo directory if it doesn't exist
 local undodir = vim.fn.expand("~/.vim/undodir")
 if vim.fn.isdirectory(undodir) == 0 then
-    vim.fn.mkdir(undodir, "p")
+  vim.fn.mkdir(undodir, "p")
 end
 
 -- File handling
@@ -328,58 +347,55 @@ vim.opt.splitright = true -- Vertical splits go right
 
 -- Better autocomplete
 vim.api.nvim_create_autocmd("LspAttach", {
-    callback = function(event)
-        local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
-        if client:supports_method("textDocument/completion") then
-            vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
-        end
+  callback = function(event)
+    local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
+    if client:supports_method("textDocument/completion") then
+      vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
+    end
 
-        -- LSP keymaps
-        local bufmap = function(mode, lhs, rhs, desc)
-            vim.keymap.set(mode, lhs, rhs, { buffer = event.buf, desc = "LSP: " .. desc })
-        end
+    -- LSP keymaps
+    local bufmap = function(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = event.buf, desc = "LSP: " .. desc })
+    end
 
-        -- Auto-format ("lint") on save.
-        -- Usually not needed if server supports 'textDocument/willSaveWaitUntil'.
-        if not client:supports_method("textDocument/willSaveWaitUntil")
-            and client:supports_method("textDocument/formatting") then
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                group = vim.api.nvim_create_augroup("my.lsp", { clear = false }),
-                buffer = event.buf,
-                callback = function()
-                    vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 1000 })
-                end,
-            })
-        end
+    -- Auto-format ("lint") on save.
+    -- Usually not needed if server supports 'textDocument/willSaveWaitUntil'.
+    if not client:supports_method("textDocument/willSaveWaitUntil")
+        and client:supports_method("textDocument/formatting") then
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = vim.api.nvim_create_augroup("my.lsp", { clear = false }),
+        buffer = event.buf,
+        callback = function()
+          vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 1000 })
+        end,
+      })
+    end
 
-        -- Default Neovim v0.11 Style Mappings
-        bufmap("n", "K", vim.lsp.buf.hover, "Show hover information")
-        bufmap("n", "grr", vim.lsp.buf.references, "Go to references")
-        bufmap("n", "gri", vim.lsp.buf.implementation, "Go to implementation")
-        bufmap("n", "grn", vim.lsp.buf.rename, "Rename symbol")
-        bufmap("n", "gra", vim.lsp.buf.code_action, "Execute code action")
-        bufmap("n", "gO", vim.lsp.buf.document_symbol, "List document symbols")
-        bufmap({ "i", "s" }, "<C-s>", vim.lsp.buf.signature_help, "Show signature help")
+    -- Default Neovim v0.11 Style Mappings
+    bufmap("n", "K", vim.lsp.buf.hover, "Show hover information")
+    bufmap("n", "grr", vim.lsp.buf.references, "Go to references")
+    bufmap("n", "gri", vim.lsp.buf.implementation, "Go to implementation")
+    bufmap("n", "grn", vim.lsp.buf.rename, "Rename symbol")
+    bufmap("n", "gra", vim.lsp.buf.code_action, "Execute code action")
+    bufmap("n", "gO", vim.lsp.buf.document_symbol, "List document symbols")
+    bufmap({ "i", "s" }, "<C-s>", vim.lsp.buf.signature_help, "Show signature help")
 
-        -- Custom Mappings
-        bufmap("n", "gd", vim.lsp.buf.definition, "Go to definition")
-        bufmap("n", "grt", vim.lsp.buf.type_definition, "Go to type definition")
-        bufmap("n", "grd", vim.lsp.buf.declaration, "Go to declaration")
-    end,
+    -- Custom Mappings
+    bufmap("n", "gd", vim.lsp.buf.definition, "Go to definition")
+    bufmap("n", "grt", vim.lsp.buf.type_definition, "Go to type definition")
+    bufmap("n", "grd", vim.lsp.buf.declaration, "Go to declaration")
+  end,
 })
 vim.cmd("set completeopt+=noselect")
 
-vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "jdtls", "fish_lsp", "bashls", "jsonls", "taplo" })
+vim.lsp.enable({ "lua_ls", "gopls", "ts_ls", "jdtls", "fish_lsp", "bashls", "jsonls", "taplo", "hyprls", "qmlls",
+  "qml_language_server" })
 
 vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format current buffer" })
 
 -- ============================================================================
 -- KEYMAPS
 -- ============================================================================
-
--- Key mappings
-vim.g.mapleader = " "      -- Set leader key to space
-vim.g.maplocalleader = " " -- Set local leader key (NEW)
 
 -- Normal mode mappings
 vim.keymap.set("n", "<leader>c", ":nohlsearch<CR>", { desc = "Clear search highlights" })
@@ -446,15 +462,15 @@ vim.keymap.set("n", "<leader>rl", ":source $MYVIMRC<CR>", { desc = "Reload confi
 
 -- Copy Full File-Path
 vim.keymap.set("n", "<leader>pa", function()
-    local path = vim.fn.expand("%:p")
-    vim.fn.setreg("+", path)
-    print("file:", path)
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  print("file:", path)
 end, { desc = "Copy full filepath to clipboard" })
 
 vim.keymap.set("n", "<leader>pr", function()
-    local path = vim.fn.setreg("+", vim.fn.expand("%"))
-    vim.fn.setreg("+", path)
-    print("file:", path)
+  local path = vim.fn.setreg("+", vim.fn.expand("%"))
+  vim.fn.setreg("+", path)
+  print("file:", path)
 end, {})
 
 -- Basic autocommands
@@ -462,101 +478,101 @@ local augroup = vim.api.nvim_create_augroup("UserConfig", {})
 
 -- Highlight yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {
-    group = augroup,
-    callback = function()
-        vim.highlight.on_yank()
-    end,
+  group = augroup,
+  callback = function()
+    vim.highlight.on_yank()
+  end,
 })
 
 -- Return to last edit position when opening files
 vim.api.nvim_create_autocmd("BufReadPost", {
-    group = augroup,
-    callback = function()
-        local mark = vim.api.nvim_buf_get_mark(0, '"')
-        local lcount = vim.api.nvim_buf_line_count(0)
-        local line = mark[1]
-        local ft = vim.bo.filetype
-        if line > 0 and line <= lcount
-            and vim.fn.index({ "commit", "gitrebase", "xxd" }, ft) == -1
-            and not vim.o.diff then
-            pcall(vim.api.nvim_win_set_cursor, 0, mark)
-        end
-    end,
+  group = augroup,
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    local line = mark[1]
+    local ft = vim.bo.filetype
+    if line > 0 and line <= lcount
+        and vim.fn.index({ "commit", "gitrebase", "xxd" }, ft) == -1
+        and not vim.o.diff then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
 })
 
 -- Set filetype-specific settings
 vim.api.nvim_create_autocmd("FileType", {
-    group = augroup,
-    pattern = { "lua", "python" },
-    callback = function()
-        vim.opt_local.tabstop = 4
-        vim.opt_local.shiftwidth = 4
-    end,
+  group = augroup,
+  pattern = { "python" },
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+  end,
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-    group = augroup,
-    pattern = { "javascript", "typescript", "json", "html", "css" },
-    callback = function()
-        vim.opt_local.tabstop = 2
-        vim.opt_local.shiftwidth = 2
-    end,
+  group = augroup,
+  pattern = { "javascript", "typescript", "json", "html", "css" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+  end,
 })
 
 -- Auto-close terminal when process exits
 vim.api.nvim_create_autocmd("TermClose", {
-    group = augroup,
-    callback = function()
-        if vim.v.event.status == 0 then
-            vim.api.nvim_buf_delete(0, {})
-        end
-    end,
+  group = augroup,
+  callback = function()
+    if vim.v.event.status == 0 then
+      vim.api.nvim_buf_delete(0, {})
+    end
+  end,
 })
 
 -- Disable line numbers in terminal
 vim.api.nvim_create_autocmd("TermOpen", {
-    group = augroup,
-    callback = function()
-        vim.opt_local.number = false
-        vim.opt_local.relativenumber = false
-        vim.opt_local.signcolumn = "no"
-    end,
+  group = augroup,
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = "no"
+  end,
 })
 
 -- Auto-resize splits when window is resized
 vim.api.nvim_create_autocmd("VimResized", {
-    group = augroup,
-    callback = function()
-        vim.cmd("tabdo wincmd =")
-    end,
+  group = augroup,
+  callback = function()
+    vim.cmd("tabdo wincmd =")
+  end,
 })
 
 -- Create directories when saving files
 vim.api.nvim_create_autocmd("BufWritePre", {
-    group = augroup,
-    callback = function()
-        local dir = vim.fn.expand("<afile>:p:h")
-        if vim.fn.isdirectory(dir) == 0 then
-            vim.fn.mkdir(dir, "p")
-        end
-    end,
+  group = augroup,
+  callback = function()
+    local dir = vim.fn.expand("<afile>:p:h")
+    if vim.fn.isdirectory(dir) == 0 then
+      vim.fn.mkdir(dir, "p")
+    end
+  end,
 })
 
 -- Enable filetype specific highlighting
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "lua" },
-    callback = function() vim.treesitter.start() end,
+  pattern = { "lua" },
+  callback = function() vim.treesitter.start() end,
 })
 
 -- Add keybind for live preview of Markdown files.
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "markdown",
-    callback = function()
-        vim.keymap.set("n", "<leader>mp", "<Plug>MarkdownPreviewToggle", {
-            buffer = true, -- limits mapping to open Markdown buffers.
-            desc = "Toggle Markdown Preview"
-        })
-    end,
+  pattern = "markdown",
+  callback = function()
+    vim.keymap.set("n", "<leader>mp", "<Plug>MarkdownPreviewToggle", {
+      buffer = true, -- limits mapping to open Markdown buffers.
+      desc = "Toggle Markdown Preview"
+    })
+  end,
 })
 
 -- Command-line completion
@@ -590,40 +606,40 @@ vim.keymap.set("n", "<leader>t<", ":tabmove -1<CR>", { desc = "Move tab left" })
 
 -- Function to open file in new tab
 local function open_file_in_tab()
-    vim.ui.input({ prompt = "File to open in new tab: ", completion = "file" }, function(input)
-        if input and input ~= "" then
-            vim.cmd("tabnew " .. input)
-        end
-    end)
+  vim.ui.input({ prompt = "File to open in new tab: ", completion = "file" }, function(input)
+    if input and input ~= "" then
+      vim.cmd("tabnew " .. input)
+    end
+  end)
 end
 
 -- Function to duplicate current tab
 local function duplicate_tab()
-    local current_file = vim.fn.expand("%:p")
-    if current_file ~= "" then
-        vim.cmd("tabnew " .. current_file)
-    else
-        vim.cmd("tabnew")
-    end
+  local current_file = vim.fn.expand("%:p")
+  if current_file ~= "" then
+    vim.cmd("tabnew " .. current_file)
+  else
+    vim.cmd("tabnew")
+  end
 end
 
 -- Function to close tabs to the right
 local function close_tabs_right()
-    local current_tab = vim.fn.tabpagenr()
-    local last_tab = vim.fn.tabpagenr("$")
+  local current_tab = vim.fn.tabpagenr()
+  local last_tab = vim.fn.tabpagenr("$")
 
-    for i = last_tab, current_tab + 1, -1 do
-        vim.cmd(i .. "tabclose")
-    end
+  for i = last_tab, current_tab + 1, -1 do
+    vim.cmd(i .. "tabclose")
+  end
 end
 
 -- Function to close tabs to the left
 local function close_tabs_left()
-    local current_tab = vim.fn.tabpagenr()
+  local current_tab = vim.fn.tabpagenr()
 
-    for _ = current_tab - 1, 1, -1 do
-        vim.cmd("1tabclose")
-    end
+  for _ = current_tab - 1, 1, -1 do
+    vim.cmd("1tabclose")
+  end
 end
 
 -- Enhanced keybindings
@@ -634,18 +650,18 @@ vim.keymap.set("n", "<leader>tL", close_tabs_left, { desc = "Close tabs to the l
 
 -- Function to close buffer but keep tab if it's the only buffer in tab
 local function smart_close_buffer()
-    local buffers_in_tab = #vim.fn.tabpagebuflist()
-    if buffers_in_tab > 1 then
-        vim.cmd("bdelete")
-    else
-        -- If it's the only buffer in tab, close the tab
-        vim.cmd("tabclose")
-    end
+  local buffers_in_tab = #vim.fn.tabpagebuflist()
+  if buffers_in_tab > 1 then
+    vim.cmd("bdelete")
+  else
+    -- If it's the only buffer in tab, close the tab
+    vim.cmd("tabclose")
+  end
 end
 vim.keymap.set("n", "<leader>bd", smart_close_buffer, { desc = "Smart close buffer/tab" })
 
 vim.filetype.add({
-    filename = {
-        ["go.work"] = "gowork"
-    },
+  filename = {
+    ["go.work"] = "gowork"
+  },
 })
